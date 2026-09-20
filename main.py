@@ -1,1 +1,81 @@
-STOCK_PRICES = {\n    'AAPL': 180.00,\n    'TSLA': 250.00,\n    'MSFT': 420.00,\n    'GOOGL': 170.00,\n    'AMZN': 190.00,\n}\n\n\ndef add_stock(portfolio):\n    stock = input('Enter stock symbol (or done to finish): ').strip().upper()\n\n    if stock == 'DONE':\n        return False\n\n    if stock not in STOCK_PRICES:\n        print('Stock not found.')\n        print('Available stocks:', ', '.join(STOCK_PRICES))\n        return True\n\n    try:\n        quantity = int(input('Enter quantity of ' + stock + ': '))\n    except ValueError:\n        print('Please enter a whole number for quantity.')\n        return True\n\n    if quantity <= 0:\n        print('Quantity must be greater than 0.')\n        return True\n\n    portfolio[stock] = portfolio.get(stock, 0) + quantity\n    print('Added', quantity, 'share(s) of', stock)\n    return True\n\n\ndef display_summary(portfolio):\n    print('\\n===== PORTFOLIO SUMMARY =====')\n\n    if not portfolio:\n        print('No stocks were added.')\n        return 0.0\n\n    total = 0.0\n    for stock, quantity in portfolio.items():\n        price = STOCK_PRICES[stock]\n        investment = price * quantity\n        total += investment\n        print('{}: {} share(s) x ${:.2f} = ${:.2f}'.format(stock, quantity, price, investment))\n\n    print('------------------------------')\n    print('Total Investment: ${:.2f}'.format(total))\n    return total\n\n\ndef save_to_file(portfolio, total, filename='portfolio.txt'):\n    with open(filename, 'w', encoding='utf-8') as file:\n        file.write('===== STOCK PORTFOLIO =====\\n')\n        for stock, quantity in portfolio.items():\n            price = STOCK_PRICES[stock]\n            investment = price * quantity\n            file.write('{}: {} share(s) x ${:.2f} = ${:.2f}\\n'.format(stock, quantity, price, investment))\n        file.write('--------------------------\\n')\n        file.write('Total Investment: ${:.2f}\\n'.format(total))\n\n    print('Portfolio saved to', filename)\n\n\ndef main():\n    portfolio = {}\n\n    print('===== STOCK PORTFOLIO TRACKER =====')\n    print('Available stocks:', ', '.join(STOCK_PRICES))\n\n    while add_stock(portfolio):\n        pass\n\n    total = display_summary(portfolio)\n\n    if portfolio:\n        save_choice = input('Save the result to portfolio.txt? (yes/no): ').strip().lower()\n        if save_choice == 'yes':\n            save_to_file(portfolio, total)\n\n\nif __name__ == '__main__':\n    main()\n
+# Stock Portfolio Tracker
+
+# Hardcoded stock prices
+stock_prices = {
+    "AAPL": 180,
+    "TSLA": 250,
+    "MSFT": 420,
+    "GOOGL": 170,
+    "AMZN": 190
+}
+
+# Store user's portfolio
+portfolio = {}
+
+print("===== STOCK PORTFOLIO TRACKER =====")
+
+while True:
+    stock = input("Enter stock symbol (or 'done' to finish): ").upper()
+
+    # Stop taking input
+    if stock == "DONE":
+        break
+
+    # Check whether stock exists
+    if stock not in stock_prices:
+        print("Stock not found. Please choose from:")
+        print(", ".join(stock_prices.keys()))
+        continue
+
+    # Get quantity
+    try:
+        quantity = int(input(f"Enter quantity of {stock}: "))
+
+        if quantity <= 0:
+            print("Quantity must be greater than 0.")
+            continue
+
+    except ValueError:
+        print("Please enter a valid number.")
+        continue
+
+    # Add stock to portfolio
+    portfolio[stock] = portfolio.get(stock, 0) + quantity
+
+# Calculate total investment
+total_investment = 0
+
+print("===== PORTFOLIO SUMMARY =====")
+
+for stock, quantity in portfolio.items():
+
+    price = stock_prices[stock]
+    investment = price * quantity
+    total_investment += investment
+
+    print(
+        f"{stock}: {quantity} shares × ${price} = ${investment}"
+    )
+
+print("------------------------------")
+print(f"Total Investment: ${total_investment}")
+
+# Optional: Save results to a text file
+save_file = input("\nDo you want to save the result? (yes/no): ").lower()
+
+if save_file == "yes":
+    with open("portfolio.txt", "w") as file:
+        file.write("===== STOCK PORTFOLIO =====\n")
+
+        for stock, quantity in portfolio.items():
+            price = stock_prices[stock]
+            investment = price * quantity
+
+            file.write(
+                f"{stock}: {quantity} shares × ${price} = ${investment}\n"
+            )
+
+        file.write("--------------------------\n")
+        file.write(f"Total Investment: ${total_investment}\n")
+
+    print("Portfolio saved successfully in portfolio.txt")
